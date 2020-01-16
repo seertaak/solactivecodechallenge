@@ -1,19 +1,17 @@
-package com.solactive.codechallenge.message;
+package com.solactive.codechallenge.json;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class Ticks {
+public class ConfigMsg {
     public String instrument;
-    public float price;
-    public long timestamp;
+    public int maxMessagesInWindow;
 
-    public Ticks() {}
+    public ConfigMsg() {}
 
-    public Ticks(String instrument, float price, long timestamp) {
+    public ConfigMsg(String instrument, int maxMessagesInWindow) {
         this.instrument = instrument;
-        this.price = price;
-        this.timestamp = timestamp;
+        this.maxMessagesInWindow = maxMessagesInWindow;
     }
 
     public String toString() {
