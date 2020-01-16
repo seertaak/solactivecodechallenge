@@ -16,10 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Path("/")
 public class RestEndpoints {
-    public final Random random = new Random();
-
-    private final Map<String, Object> statistics = new ConcurrentHashMap<>();
-
     @GET
     @Path("/statistics")
     @Produces(MediaType.APPLICATION_JSON)
