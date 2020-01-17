@@ -70,6 +70,12 @@ etc.
 
 ### Assumptions
 
+- I assume that the correct behaviour when dealing with a burst of messages too large
+to cope with in a timely fashion *is to simply drop the messages*. This is obviously
+extreme but in my experience it's better to design the system this way: it's not hard
+to set the size of the underlying ring buffer which handles this to be several multiples
+of the worst expected load. 
+- Because some the calculations require significant space
 - I process out-of-order messages, because this is how I read the spec initially. However,
 I don't think this is the best approach, as I expressed in a WhatsApp message to Toralf 
 Niehbuhr:
@@ -108,6 +114,11 @@ the two (for POST request - for GET we simply read the cached values).
 
 ### Improvements
 
+- Even assuming that out-of-order messages must be processed, there are
+more clever algorithm for min/max and avg that doesn't require traversing the whole
+set of messages. E.g. for avg you want to remove the contribution of any prices that
+are too old, and add back the contribution of the newer messages. I didn't do this because
+I wanted to focus on other things like tests etc.
 - It's disappointing that when the disruptor is saturated, it drops the *newest* messages.
 I used that since it's available and to try it out. But really, I would want something - 
 again using a ring buffer - where if you saturate the *oldest* messages instead.
