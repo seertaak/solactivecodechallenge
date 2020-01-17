@@ -1,13 +1,14 @@
-package com.solactive.codechallenge;
+package com.solactive.codechallenge.disruptor;
 
 import com.lmax.disruptor.EventHandler;
-import com.solactive.codechallenge.calculator.StatsCalculatorAggregate;
+import com.solactive.codechallenge.calculator.StatsAggregator;
+import com.solactive.codechallenge.calculator.StockToStatsCalculatorMap;
 
 public class StockTickEventHandler implements EventHandler<StockTickEvent> {
-    private final StockStatsDb _map;
-    private final StatsCalculatorAggregate _aggStats;
+    private final StockToStatsCalculatorMap _map;
+    private final StatsAggregator _aggStats;
 
-    public StockTickEventHandler(final StockStatsDb map, final StatsCalculatorAggregate aggStats) {
+    public StockTickEventHandler(final StockToStatsCalculatorMap map, final StatsAggregator aggStats) {
         _map = map;
         _aggStats = aggStats;
     }

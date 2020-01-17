@@ -3,7 +3,9 @@ package com.solactive.codechallenge.json;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class TicksMsg {
+import java.io.Serializable;
+
+public class TicksMsg implements Serializable {
     public String instrument;
     public float price;
     public long timestamp;

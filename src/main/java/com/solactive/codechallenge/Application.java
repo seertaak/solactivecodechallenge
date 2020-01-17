@@ -1,22 +1,21 @@
 package com.solactive.codechallenge;
 
 import com.lmax.disruptor.InsufficientCapacityException;
-import com.lmax.disruptor.LiteTimeoutBlockingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.solactive.codechallenge.calculator.StatsCalculatorAggregate;
+import com.solactive.codechallenge.calculator.StatsAggregator;
+import com.solactive.codechallenge.calculator.StockToStatsCalculatorMap;
+import com.solactive.codechallenge.disruptor.StockTickEvent;
+import com.solactive.codechallenge.disruptor.StockTickEventHandler;
 import com.solactive.codechallenge.json.StatisticsMsg;
 import com.solactive.codechallenge.json.TicksMsg;
-
-import java.util.concurrent.TimeUnit;
 
 public class Application {
     public static final int DEF_BUFFER_CAPACITY = 1 << 22; // ~ = 1GB memory, allows 33.6MM messages in queue.
 
     private final Disruptor<StockTickEvent> _disruptor;
-    private final StockStatsDb _instIdToStockStats;
-    private final StatsCalculatorAggregate _aggregateStats;
+    private final StockToStatsCalculatorMap _instIdToStockStats;
+    private final StatsAggregator _aggregateStats;
 
     public Application() {
         this(DEF_BUFFER_CAPACITY);
@@ -26,20 +25,18 @@ public class Application {
         _disruptor = new Disruptor<>(
                 StockTickEvent::new,
                 bufferSize,
-                DaemonThreadFactory.INSTANCE,
-                ProducerType.MULTI,
-                new LiteTimeoutBlockingWaitStrategy(1, TimeUnit.MICROSECONDS)
+                DaemonThreadFactory.INSTANCE
         );
 
-        _instIdToStockStats = new StockStatsDb();
-        _aggregateStats = new StatsCalculatorAggregate(_instIdToStockStats);
+        _instIdToStockStats = new StockToStatsCalculatorMap();
+        _aggregateStats = new StatsAggregator(_instIdToStockStats);
 
         _disruptor.handleEventsWith(new StockTickEventHandler(_instIdToStockStats, _aggregateStats));
         _disruptor.start();
     }
 
     public StatisticsMsg currStockStats(String instId) {
-        final var internalStockId = _instIdToStockStats.inernalId(instId);
+        final var internalStockId = _instIdToStockStats.internalId(instId);
         final var stockStats = _instIdToStockStats.stockStats(internalStockId);
         return stockStats != null ? stockStats.currentStats() : null;
     }
@@ -74,11 +71,15 @@ public class Application {
         final var buffer = _disruptor.getRingBuffer();
 
         // NOTE: internalId() blocks, but is O(1) and the time ought to be negligible.
-        final var internalStockId = _instIdToStockStats.inernalId(msg.instrument);
+        final var internalStockId = _instIdToStockStats.internalId(msg.instrument);
 
         // Now: put the message in the ring buffer for consumers (i.e. stock stat
         // calculators) to update their state.
         try {
+            // Remark: Use tryNext() because it doesn't block. If there is no space, then
+            // the call will throw an InsufficientCapacity exception which is currently
+            // not handled at all.
+
             long sequence = buffer.tryNext();
             try {
                 var event = buffer.get(sequence);

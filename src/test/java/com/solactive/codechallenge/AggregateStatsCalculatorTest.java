@@ -1,27 +1,28 @@
 package com.solactive.codechallenge;
 
-import com.solactive.codechallenge.calculator.StatsCalculatorAggregate;
+import com.solactive.codechallenge.calculator.StatsAggregator;
+import com.solactive.codechallenge.calculator.StockToStatsCalculatorMap;
 import com.solactive.codechallenge.json.StatisticsMsg;
 import junit.framework.TestCase;
 
 public class AggregateStatsCalculatorTest extends TestCase {
     public void testReferentialMapping() {
-        final var map = new StockStatsDb();
-        assertEquals(0, map.inernalId("MSFT"));
-        assertEquals(0, map.inernalId("MSFT"));
-        assertEquals(1, map.inernalId("GOOG"));
-        assertEquals(0, map.inernalId("MSFT"));
-        assertEquals(1, map.inernalId("GOOG"));
+        final var map = new StockToStatsCalculatorMap();
+        assertEquals(0, map.internalId("MSFT"));
+        assertEquals(0, map.internalId("MSFT"));
+        assertEquals(1, map.internalId("GOOG"));
+        assertEquals(0, map.internalId("MSFT"));
+        assertEquals(1, map.internalId("GOOG"));
     }
 
     public void testNonExistentInternalIdYieldsNullCalculator() {
-        final var map = new StockStatsDb();
+        final var map = new StockToStatsCalculatorMap();
         assertNull(map.stockStats(1000));
     }
 
     public void testCalculator() {
-        final var map = new StockStatsDb();
-        var msft = map.stockStats(map.inernalId("MSFT"));
+        final var map = new StockToStatsCalculatorMap();
+        var msft = map.stockStats(map.internalId("MSFT"));
         assertNotNull(msft);
         assertEquals(
             new StatisticsMsg(1.f, 1.f, 1.f, 1),
@@ -30,10 +31,10 @@ public class AggregateStatsCalculatorTest extends TestCase {
     }
 
     public void testCalculatorAggregationOneStock() {
-        final var map = new StockStatsDb();
-        final var aggStats = new StatsCalculatorAggregate(map);
+        final var map = new StockToStatsCalculatorMap();
+        final var aggStats = new StatsAggregator(map);
 
-        var msft = map.stockStats(map.inernalId("MSFT"));
+        var msft = map.stockStats(map.internalId("MSFT"));
         assertEquals(1, map.allStockStats().size());
 
         msft.show(0, 0, 1.f);
@@ -43,12 +44,12 @@ public class AggregateStatsCalculatorTest extends TestCase {
     }
 
     public void testCalculatorAggregation() {
-        final var map = new StockStatsDb();
-        final var aggStats = new StatsCalculatorAggregate(map);
+        final var map = new StockToStatsCalculatorMap();
+        final var aggStats = new StatsAggregator(map);
 
-        var msft = map.stockStats(map.inernalId("MSFT"));
+        var msft = map.stockStats(map.internalId("MSFT"));
         assertEquals(1, map.allStockStats().size());
-        var goog = map.stockStats(map.inernalId("GOOG"));
+        var goog = map.stockStats(map.internalId("GOOG"));
         assertEquals(2, map.allStockStats().size());
 
         msft.show(0, 0, 1.f);

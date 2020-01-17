@@ -1,11 +1,11 @@
 package com.solactive.codechallenge;
 
-import com.solactive.codechallenge.calculator.StatsCalculatorSingleStock;
+import com.solactive.codechallenge.calculator.StatsCalculator;
 import junit.framework.TestCase;
 
 public class SingleStockStatsCalculatorTest extends TestCase {
 
-    final StatsCalculatorSingleStock calculator = new StatsCalculatorSingleStock("FOO");
+    final StatsCalculator calculator = new StatsCalculator("FOO");
 
     public void testInstId() {
         assertEquals(calculator.instId, "FOO");
@@ -16,8 +16,8 @@ public class SingleStockStatsCalculatorTest extends TestCase {
     }
 
     public void testShowingExpiredEventIsNop() {
-        calculator.show(StatsCalculatorSingleStock.WINDOW_MILLIS, StatsCalculatorSingleStock.WINDOW_MILLIS - 1, 1.0f);
-        calculator.show(StatsCalculatorSingleStock.WINDOW_MILLIS + 1, 0, 100.0f);
+        calculator.show(StatsCalculator.WINDOW_MILLIS, StatsCalculator.WINDOW_MILLIS - 1, 1.0f);
+        calculator.show(StatsCalculator.WINDOW_MILLIS + 1, 0, 100.0f);
 
         final var stats = calculator.currentStats();
         assertEquals(1.f, stats.avg);

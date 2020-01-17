@@ -1,15 +1,12 @@
 package com.solactive.codechallenge;
 
-import com.solactive.codechallenge.calculator.StatsCalculatorSingleStock;
+import com.solactive.codechallenge.calculator.StatsCalculator;
 import com.solactive.codechallenge.json.StatisticsMsg;
 import com.solactive.codechallenge.json.TicksMsg;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * All endpoints: /ticks and /statistics.
@@ -35,11 +32,20 @@ public class RestEndpoints {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postTicks(final TicksMsg msg) {
         final long now = System.currentTimeMillis();
-        if (msg.timestamp < now - StatsCalculatorSingleStock.WINDOW_MILLIS || msg.instrument == null || msg.price <= 0)
+        if (msg.timestamp < now - StatsCalculator.WINDOW_MILLIS
+                || msg.timestamp >= now + 10 // ignore messages from THE FUTURE. (+ 10 is for clock drift)
+                || msg.instrument == null
+                || msg.price <= 0)
             return Response.status(Response.Status.NO_CONTENT).build();
 
         Main.app.showTicksMsg(msg);
 
         return Response.status(Response.Status.CREATED).build();
+    }
+
+    @GET
+    @Path("/ping")
+    public String ping() {
+        return "pong";
     }
 }

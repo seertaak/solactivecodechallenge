@@ -1,20 +1,19 @@
 package com.solactive.codechallenge.calculator;
 
-import com.solactive.codechallenge.StockStatsDb;
 import com.solactive.codechallenge.json.StatisticsMsg;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StatsCalculatorAggregate {
-    private final StockStatsDb _refMapping;
+public class StatsAggregator {
+    private final StockToStatsCalculatorMap _refMapping;
 
-    private final List<StatisticsMsg> _latestStockStats = new ArrayList<>(StockStatsDb.MAX_STOCKS);
+    private final List<StatisticsMsg> _latestStockStats = new ArrayList<>(StockToStatsCalculatorMap.MAX_STOCKS);
 
-    public StatsCalculatorAggregate(StockStatsDb refMapping) {
+    public StatsAggregator(StockToStatsCalculatorMap refMapping) {
         _refMapping = refMapping;
 
-        for (int i = 0; i < StockStatsDb.MAX_STOCKS; i++)
+        for (int i = 0; i < StockToStatsCalculatorMap.MAX_STOCKS; i++)
             _latestStockStats.add(null);
     }
 

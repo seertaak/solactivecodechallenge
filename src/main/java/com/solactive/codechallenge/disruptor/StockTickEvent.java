@@ -1,4 +1,4 @@
-package com.solactive.codechallenge;
+package com.solactive.codechallenge.disruptor;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

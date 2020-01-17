@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.PriorityQueue;
 
-public class StatsCalculatorSingleStock {
+public class StatsCalculator {
     public final String instId;
 
     private static class Slot implements Comparable<Slot> {
@@ -30,7 +30,7 @@ public class StatsCalculatorSingleStock {
 
     public static final long WINDOW_MILLIS = 60*1000;
 
-    public StatsCalculatorSingleStock(final String instId) {
+    public StatsCalculator(final String instId) {
         this.instId = instId;
     }
 
@@ -43,7 +43,7 @@ public class StatsCalculatorSingleStock {
     final private PriorityQueue<Slot> _buffer = new PriorityQueue<>();
 
     public StatisticsMsg show(final long now, final long time, final float price) {
-        if (time < now - StatsCalculatorSingleStock.WINDOW_MILLIS || price <= 0)
+        if (time < now - StatsCalculator.WINDOW_MILLIS || price <= 0)
             return null;
 
         synchronized (this) {
